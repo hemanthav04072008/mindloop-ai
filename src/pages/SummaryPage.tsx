@@ -5,9 +5,14 @@ import {
   Check, 
   Download, 
   Search, 
-  Share2
+  Share2,
+  Volume2,
+  Play,
+  Pause,
+  ArrowRight
 } from 'lucide-react';
 import { SAMPLE_NOTE_CELLULAR_RESPIRATION } from '../data/sampleNotes';
+import { EmptyState } from '../components/EmptyState';
 
 interface SummaryPageProps {
   setActiveTab: (tab: string) => void;
@@ -18,6 +23,7 @@ export const SummaryPage: React.FC<SummaryPageProps> = ({ setActiveTab, onOpenSh
   const [copied, setCopied] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const [activeSubTab, setActiveSubTab] = useState<'concepts' | 'formulas' | 'definitions' | 'examples'>('concepts');
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
   const note = SAMPLE_NOTE_CELLULAR_RESPIRATION;
 
@@ -31,6 +37,14 @@ export const SummaryPage: React.FC<SummaryPageProps> = ({ setActiveTab, onOpenSh
     alert("MindLoop AI Summary exported as PDF! (Simulated Download)");
   };
 
+  const toggleAudio = () => {
+    setIsPlayingAudio(!isPlayingAudio);
+  };
+
+  const filteredConcepts = note.keyConcepts.filter((c) =>
+    c.toLowerCase().includes(searchFilter.toLowerCase())
+  );
+
   return (
     <div className="space-y-6 animate-fadeIn">
       
@@ -40,7 +54,7 @@ export const SummaryPage: React.FC<SummaryPageProps> = ({ setActiveTab, onOpenSh
           
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-xs font-bold text-[#4ECDC4] uppercase tracking-wider">
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 text-[#4ECDC4]" />
               <span>AI Synthesized Note Summary</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-[#Outfit]">
@@ -52,7 +66,19 @@ export const SummaryPage: React.FC<SummaryPageProps> = ({ setActiveTab, onOpenSh
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            <button
+              onClick={toggleAudio}
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
+                isPlayingAudio 
+                  ? 'bg-[#4ECDC4]/20 text-[#4ECDC4] border border-[#4ECDC4]/40 animate-pulse' 
+                  : 'bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200'
+              }`}
+            >
+              {isPlayingAudio ? <Pause className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-[#4ECDC4]" />}
+              <span>{isPlayingAudio ? 'Pause Audio Digest' : '2-Min AI Audio Summary'}</span>
+            </button>
+
             {onOpenShare && (
               <button
                 onClick={onOpenShare}
@@ -132,13 +158,19 @@ export const SummaryPage: React.FC<SummaryPageProps> = ({ setActiveTab, onOpenSh
             <div className="space-y-3">
               <h2 className="text-lg font-bold text-white font-[#Outfit] flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#6C63FF]" />
-                <span>Executive Key Concepts</span>
+                <span>Executive Key Concepts ({filteredConcepts.length})</span>
               </h2>
 
-              <div className="space-y-3">
-                {note.keyConcepts
-                  .filter((c) => c.toLowerCase().includes(searchFilter.toLowerCase()))
-                  .map((concept, idx) => (
+              {filteredConcepts.length === 0 ? (
+                <EmptyState
+                  title="No Matching Concepts Found"
+                  description={`No key concept matches "${searchFilter}". Try adjusting your search query.`}
+                  actionText="Clear Search"
+                  onAction={() => setSearchFilter('')}
+                />
+              ) : (
+                <div className="space-y-3">
+                  {filteredConcepts.map((concept, idx) => (
                     <div
                       key={idx}
                       className="glass-panel p-4 space-y-2 border border-white/10 hover:border-[#6C63FF]/40 transition-all"
@@ -153,7 +185,8 @@ export const SummaryPage: React.FC<SummaryPageProps> = ({ setActiveTab, onOpenSh
                       </div>
                     </div>
                   ))}
-              </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -241,6 +274,7 @@ export const SummaryPage: React.FC<SummaryPageProps> = ({ setActiveTab, onOpenSh
               className="w-full btn-primary-glow py-3 text-xs font-bold text-white rounded-xl flex items-center justify-center gap-2 shadow-lg cursor-pointer"
             >
               <span>Practice 3D Flashcards</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 

@@ -11,7 +11,10 @@ import {
   ArrowRight, 
   Flame,
   Zap,
-  Target
+  Target,
+  Volume2,
+  VolumeX,
+  Award
 } from 'lucide-react';
 import { QuizQuestion } from '../types';
 
@@ -29,6 +32,7 @@ export const QuizPage: React.FC<QuizPageProps> = ({ questions, setActiveTab }) =
   const [isQuizComplete, setIsQuizComplete] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30); // 30s per question
   const [userAnswers, setUserAnswers] = useState<Record<string, { isCorrect: boolean; userAns: string }>>({});
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   const currentQ = questions[currentIdx] || questions[0];
 
@@ -80,11 +84,15 @@ export const QuizPage: React.FC<QuizPageProps> = ({ questions, setActiveTab }) =
       setTimeLeft(30);
     } else {
       setIsQuizComplete(true);
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      try {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } catch (e) {
+        // fallback
+      }
     }
   };
 
@@ -98,6 +106,9 @@ export const QuizPage: React.FC<QuizPageProps> = ({ questions, setActiveTab }) =
     setTimeLeft(30);
     setUserAnswers({});
   };
+
+  const timerColor = timeLeft > 15 ? '#4ECDC4' : timeLeft > 7 ? '#FFB84D' : '#FF4757';
+  const progressPercentage = ((currentIdx + 1) / questions.length) * 100;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fadeIn">
@@ -114,15 +125,23 @@ export const QuizPage: React.FC<QuizPageProps> = ({ questions, setActiveTab }) =
                 <span className="text-xs font-bold text-[#4ECDC4] uppercase tracking-wider">
                   Adaptive Quiz Loop
                 </span>
-                <h2 className="text-base font-bold text-white">
+                <h2 className="text-base font-bold text-white font-[#Outfit]">
                   Question {currentIdx + 1} of {questions.length}
                 </h2>
               </div>
             </div>
 
-            {/* Adaptive Difficulty Badge & Timer */}
-            <div className="flex items-center gap-4">
-              <span className={`text-xs font-bold px-3 py-1 rounded-full border ${
+            {/* Adaptive Difficulty Badge, Sound & Timer Ring */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                title={soundEnabled ? 'Mute Audio Effects' : 'Enable Audio Effects'}
+              >
+                {soundEnabled ? <Volume2 className="w-4 h-4 text-[#4ECDC4]" /> : <VolumeX className="w-4 h-4" />}
+              </button>
+
+              <span className={`text-xs font-bold px-3 py-1 rounded-full border hidden sm:inline-block ${
                 currentQ.difficulty === 'Hard'
                   ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
                   : 'bg-[#6C63FF]/10 text-[#6C63FF] border-[#6C63FF]/30'
@@ -130,11 +149,38 @@ export const QuizPage: React.FC<QuizPageProps> = ({ questions, setActiveTab }) =
                 ⚡ {currentQ.difficulty} Level
               </span>
 
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono font-bold text-amber-400">
-                <Clock className="w-4 h-4 text-amber-400" />
-                <span>{timeLeft}s</span>
+              {/* SVG Circular Timer Ring */}
+              <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    className="text-white/10 stroke-current"
+                    strokeWidth="3.5"
+                    fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path
+                    stroke={timerColor}
+                    strokeDasharray={`${(timeLeft / 30) * 100}, 100`}
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    fill="none"
+                    className="stroke-current transition-all duration-1000"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                </svg>
+                <span className="absolute text-[11px] font-mono font-extrabold text-white">
+                  {timeLeft}s
+                </span>
               </div>
             </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-[#6C63FF] via-[#4ECDC4] to-emerald-400 transition-all duration-300"
+              style={{ width: `${progressPercentage}%` }}
+            />
           </div>
 
           {/* Question Card */}
@@ -233,37 +279,80 @@ export const QuizPage: React.FC<QuizPageProps> = ({ questions, setActiveTab }) =
           </div>
         </>
       ) : (
-        /* QUIZ RESULTS PAGE & LEADERBOARD */
-        <div className="glass-panel p-8 text-center space-y-6 border border-white/20 animate-fadeIn">
+        /* QUIZ RESULTS PAGE & DETAILED BREAKDOWN */
+        <div className="glass-panel p-8 space-y-8 border border-white/20 animate-fadeIn">
           
-          <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#6C63FF] to-[#4ECDC4] p-1 mx-auto flex items-center justify-center shadow-[0_0_50px_rgba(108,99,255,0.5)]">
-            <div className="w-full h-full bg-[#13131A] rounded-full flex items-center justify-center">
-              <Trophy className="w-10 h-10 text-amber-400" />
+          <div className="text-center space-y-4">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#6C63FF] to-[#4ECDC4] p-1 mx-auto flex items-center justify-center shadow-[0_0_50px_rgba(108,99,255,0.5)]">
+              <div className="w-full h-full bg-[#13131A] rounded-full flex items-center justify-center">
+                <Trophy className="w-10 h-10 text-amber-400" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <h1 className="text-3xl font-extrabold text-white font-[#Outfit]">
+                Quiz Completed!
+              </h1>
+              <p className="text-sm text-slate-300">
+                You scored <span className="text-[#4ECDC4] font-bold">{score} out of {questions.length}</span> ({Math.round((score / questions.length) * 100)}%)
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 max-w-md mx-auto flex items-center justify-around">
+              <div>
+                <div className="text-xl font-bold text-emerald-400">+{score * 25} XP</div>
+                <div className="text-[11px] text-slate-400">Earned</div>
+              </div>
+              <div className="w-px h-8 bg-white/10" />
+              <div>
+                <div className="text-xl font-bold text-[#4ECDC4]">+4%</div>
+                <div className="text-[11px] text-slate-400">Exam Readiness</div>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <h1 className="text-3xl font-extrabold text-white font-[#Outfit]">
-              Quiz Completed!
-            </h1>
-            <p className="text-sm text-slate-300">
-              You scored <span className="text-[#4ECDC4] font-bold">{score} out of {questions.length}</span> ({Math.round((score / questions.length) * 100)}%)
-            </p>
+          {/* DETAILED QUESTION BREAKDOWN */}
+          <div className="space-y-4 border-t border-white/10 pt-6">
+            <h3 className="text-base font-bold text-white font-[#Outfit] flex items-center gap-2">
+              <Award className="w-5 h-5 text-[#4ECDC4]" />
+              <span>Answer Breakdown & Explanations</span>
+            </h3>
+
+            <div className="space-y-3">
+              {questions.map((q, idx) => {
+                const userRes = userAnswers[q.id];
+                return (
+                  <div key={q.id} className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-2 text-left">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-400">Question {idx + 1}</span>
+                      {userRes?.isCorrect ? (
+                        <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                          <CheckCircle2 className="w-4 h-4" /> Correct (+25 XP)
+                        </span>
+                      ) : (
+                        <span className="text-xs font-bold text-rose-400 flex items-center gap-1">
+                          <XCircle className="w-4 h-4" /> Incorrect
+                        </span>
+                      )}
+                    </div>
+
+                    <h4 className="text-sm font-semibold text-white">{q.question}</h4>
+
+                    <div className="text-xs text-slate-300">
+                      <span className="text-slate-400">Correct Answer:</span>{' '}
+                      <span className="text-emerald-300 font-semibold">{q.correctAnswer.toString()}</span>
+                    </div>
+
+                    <p className="text-[11px] text-slate-400 italic pt-1">
+                      Explanation: {q.explanation}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 max-w-md mx-auto flex items-center justify-around">
-            <div>
-              <div className="text-xl font-bold text-emerald-400">+{score * 25} XP</div>
-              <div className="text-[11px] text-slate-400">Earned</div>
-            </div>
-            <div className="w-px h-8 bg-white/10" />
-            <div>
-              <div className="text-xl font-bold text-[#4ECDC4]">+4%</div>
-              <div className="text-[11px] text-slate-400">Exam Readiness</div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center gap-4 pt-4">
+          <div className="flex items-center justify-center gap-4 pt-2">
             <button
               onClick={resetQuiz}
               className="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-slate-200 flex items-center gap-2 transition-all cursor-pointer"

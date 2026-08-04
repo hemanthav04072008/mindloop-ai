@@ -7,7 +7,10 @@ import {
   ArrowRight, 
   Zap, 
   CheckCircle2,
-  Info
+  Info,
+  ZoomIn,
+  ZoomOut,
+  Maximize2
 } from 'lucide-react';
 import { ConceptNode } from '../types';
 import { MOCK_CONCEPT_NODES } from '../data/mockData';
@@ -18,6 +21,7 @@ interface ConceptMapPageProps {
 
 export const ConceptMapPage: React.FC<ConceptMapPageProps> = ({ setActiveTab }) => {
   const [selectedNode, setSelectedNode] = useState<ConceptNode>(MOCK_CONCEPT_NODES[0]);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
 
   // Coordinates for rendering SVG Mind Map layout
   const nodeCoords: Record<string, { x: number; y: number }> = {
@@ -29,21 +33,54 @@ export const ConceptMapPage: React.FC<ConceptMapPageProps> = ({ setActiveTab }) 
     'node-6': { x: 450, y: 350 }, // Proton Gradient & ATP Synthase
   };
 
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.15, 1.4));
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.15, 0.7));
+  const handleResetZoom = () => setZoomLevel(1);
+
   return (
     <div className="space-y-6 animate-fadeIn">
       
       {/* Header Banner */}
       <div className="glass-panel p-6 space-y-2 border border-white/15">
-        <div className="flex items-center gap-2 text-xs font-bold text-[#4ECDC4] uppercase tracking-wider">
-          <Network className="w-4 h-4" />
-          <span>MindLoop Concept Connections™</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#4ECDC4] uppercase tracking-wider">
+              <Network className="w-4 h-4 text-[#4ECDC4]" />
+              <span>MindLoop Concept Connections™</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-[#Outfit]">
+              Interactive Concept Knowledge Graph
+            </h1>
+            <p className="text-sm text-slate-300">
+              Visualizes relationships between concepts extracted from your notes. Click any node to explore its mastery level and connected ideas.
+            </p>
+          </div>
+
+          {/* Zoom Controls */}
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleZoomIn}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleZoomOut}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleResetZoom}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+              title="Reset Zoom"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-[#Outfit]">
-          Interactive Concept Knowledge Graph
-        </h1>
-        <p className="text-sm text-slate-300">
-          Visualizes relationships between concepts extracted from your notes. Click any node to explore its mastery level and connected ideas.
-        </p>
       </div>
 
       {/* TWO COLUMNS: INTERACTIVE GRAPH & DETAILS PANEL */}
@@ -54,7 +91,7 @@ export const ConceptMapPage: React.FC<ConceptMapPageProps> = ({ setActiveTab }) 
           
           <div className="flex items-center justify-between z-10">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Cellular Respiration Topology Map
+              Cellular Respiration Topology Map ({Math.round(zoomLevel * 100)}% Zoom)
             </span>
             <div className="flex items-center gap-3 text-xs">
               <span className="flex items-center gap-1 text-[#4ECDC4]">
@@ -67,8 +104,12 @@ export const ConceptMapPage: React.FC<ConceptMapPageProps> = ({ setActiveTab }) 
           </div>
 
           {/* SVG Map Area */}
-          <div className="relative w-full h-80 sm:h-96 my-auto">
-            <svg className="w-full h-full" viewBox="0 0 850 450">
+          <div className="relative w-full h-80 sm:h-96 my-auto overflow-hidden flex items-center justify-center">
+            <svg 
+              className="w-full h-full transition-transform duration-300" 
+              viewBox="0 0 850 450"
+              style={{ transform: `scale(${zoomLevel})` }}
+            >
               {/* Draw Connection Lines between nodes */}
               {MOCK_CONCEPT_NODES.map((node) => {
                 const fromCoord = nodeCoords[node.id];
@@ -85,7 +126,7 @@ export const ConceptMapPage: React.FC<ConceptMapPageProps> = ({ setActiveTab }) 
                       y1={fromCoord.y}
                       x2={toCoord.x}
                       y2={toCoord.y}
-                      stroke="rgba(108, 99, 255, 0.35)"
+                      stroke="rgba(108, 99, 255, 0.45)"
                       strokeWidth="2"
                       strokeDasharray="4,4"
                     />

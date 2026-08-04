@@ -7,12 +7,14 @@ import {
   Clock, 
   CheckCircle2, 
   Award, 
-  Star, 
   ShieldCheck, 
   Zap,
-  BookOpen
+  Users,
+  Crown,
+  Code2
 } from 'lucide-react';
-import { UserProfile } from '../types';
+import type { UserProfile } from '../types';
+import { HACKATHON_TEAM_MEMBERS } from '../data/mockData';
 
 interface ProfilePageProps {
   user: UserProfile;
@@ -20,6 +22,7 @@ interface ProfilePageProps {
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({ user }) => {
   const xpPercentage = Math.round((user.xp / user.nextLevelXp) * 100);
+  const team = HACKATHON_TEAM_MEMBERS;
 
   return (
     <div className="space-y-8 animate-fadeIn max-w-5xl mx-auto">
@@ -50,11 +53,18 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user }) => {
               <ShieldCheck className="w-5 h-5 text-[#4ECDC4]" />
             </div>
             <p className="text-xs text-slate-300">
-              {user.email} • Stanford University
+              {user.email} • Stanford Hackathon Team
             </p>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#6C63FF]/15 border border-[#6C63FF]/30 text-[#6C63FF] text-xs font-bold uppercase tracking-wider mt-1">
-              <Zap className="w-3.5 h-3.5" />
-              <span>Title: {user.levelTitle}</span>
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#6C63FF]/15 border border-[#6C63FF]/30 text-[#6C63FF] text-xs font-bold uppercase tracking-wider">
+                <Zap className="w-3.5 h-3.5" />
+                <span>Title: {user.levelTitle}</span>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4ECDC4]/15 border border-[#4ECDC4]/30 text-[#4ECDC4] text-xs font-bold uppercase tracking-wider">
+                <Code2 className="w-3.5 h-3.5 text-[#4ECDC4]" />
+                <span>Member 1 • Frontend Lead</span>
+              </div>
             </div>
           </div>
         </div>
@@ -103,6 +113,60 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user }) => {
           <Trophy className="w-6 h-6 text-[#FFB84D] mx-auto" />
           <div className="text-2xl font-extrabold text-[#FFB84D] font-[#Outfit]">{user.badges.length}</div>
           <div className="text-xs text-slate-400">Badges Unlocked</div>
+        </div>
+      </div>
+
+      {/* 4-MEMBER TEAM LEADERBOARD SECTION */}
+      <div className="glass-panel p-6 space-y-4 border border-white/15">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-[#4ECDC4]" />
+            <h2 className="text-xl font-bold text-white font-[#Outfit]">
+              4-Member Hackathon Roster & Leaderboard
+            </h2>
+          </div>
+          <span className="text-xs font-semibold text-[#6C63FF] bg-[#6C63FF]/10 px-3 py-1 rounded-full border border-[#6C63FF]/30">
+            Team Ranked #1
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          {team.map((member, idx) => (
+            <div
+              key={member.id}
+              className="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 flex items-center justify-between gap-4 transition-all"
+            >
+              <div className="flex items-center gap-3.5">
+                <span className="text-sm font-extrabold text-slate-400 w-5 text-center">
+                  #{idx + 1}
+                </span>
+                <img
+                  src={member.avatarUrl}
+                  alt={member.name}
+                  className="w-10 h-10 rounded-full object-cover border border-white/20"
+                />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-white font-[#Outfit]">
+                      {member.name}
+                    </h3>
+                    {idx === 0 && <Crown className="w-4 h-4 text-amber-400 fill-amber-400" />}
+                  </div>
+                  <p className="text-xs text-slate-400">{member.role}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <div className="text-right">
+                  <div className="text-sm font-bold text-[#4ECDC4]">{member.xp} XP</div>
+                  <div className="text-[10px] text-slate-400">{member.cardsMastered} Cards Mastered</div>
+                </div>
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  {member.status}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -13,6 +13,29 @@ export interface Subject {
   color: string;
 }
 
+export type PDFDocument = Subject;
+
+export interface AISummary {
+  id: string;
+  subjectId: string;
+  title: string;
+  fileName: string;
+  pageCount: number;
+  keyConcepts: string[];
+  formulas: {
+    title: string;
+    latex: string;
+    explanation: string;
+  }[];
+  definitions: {
+    term: string;
+    definition: string;
+  }[];
+  examples: string[];
+  quotes: string[];
+  transformedAt: string;
+}
+
 export interface Flashcard {
   id: string;
   subjectId: string;
@@ -46,6 +69,14 @@ export interface WeakTopic {
   lastTested: string;
   recommendation: string;
   urgency: 'High' | 'Medium' | 'Low';
+}
+
+export interface AnalyticsData {
+  knowledgeScore: number;
+  examReadinessGrade: string;
+  sevenDayRetention: number;
+  weakTopics: WeakTopic[];
+  strongTopicsCount: number;
 }
 
 export interface PlannerTask {
@@ -92,6 +123,17 @@ export interface ChatMessage {
   suggestedFollowUps?: string[];
 }
 
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  avatarUrl: string;
+  xp: number;
+  streak: number;
+  status: 'Online' | 'In Quiz' | 'Focusing';
+  cardsMastered: number;
+}
+
 export interface UserProfile {
   name: string;
   email: string;
@@ -112,4 +154,13 @@ export interface UserProfile {
     unlockedAt: string;
     description: string;
   }[];
+}
+
+export type User = UserProfile;
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  timestamp: string;
 }

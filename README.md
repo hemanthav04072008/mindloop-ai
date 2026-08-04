@@ -1,79 +1,32 @@
-# MindLoop — AI Spaced Repetition & Adaptive Learning Platform
+# React + TypeScript + Vite
 
-MindLoop is an ultra-modern AI learning platform designed with a glassmorphism + neumorphism hybrid aesthetic. It transforms notes and PDFs into executive summaries, 3D flip flashcards, adaptive quizzes, weak-topic radar analysis, spaced-repetition study plans, floating AI chat with page citations, and gamified mastery tracking.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-## 🚀 Quick Start Instructions
+Currently, two official plugins are available:
 
-### 1. Open in VS Code
-Open VS Code, press `Ctrl + O` (or `Cmd + O`), and select the folder:
-```
-C:\Users\HEMANTH\Desktop\MindLoop
-```
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-### 2. Install Dependencies
-Open a terminal in VS Code (`Ctrl + ~`) and run:
-```bash
-npm install --legacy-peer-deps
-```
+## React Compiler
 
-### 3. Launch Local Development Server
-Start the local server with:
-```bash
-npm run dev
-```
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-Then open **[http://localhost:5173/](http://localhost:5173/)** in Google Chrome.
+## Expanding the Oxlint configuration
 
----
+If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
 
-## 📁 Project Structure
-
-```
-MindLoop/
-├── index.html
-├── package.json
-├── vite.config.ts
-├── tailwind.config.js
-├── postcss.config.js
-├── tsconfig.json
-├── tsconfig.app.json
-├── tsconfig.node.json
-├── public/
-└── src/
-    ├── main.tsx
-    ├── App.tsx
-    ├── index.css
-    ├── components/
-    │   ├── Navbar.tsx
-    │   ├── Sidebar.tsx
-    │   ├── QuickUploadModal.tsx
-    │   ├── FocusModeModal.tsx
-    │   └── ShareModal.tsx
-    ├── pages/
-    │   ├── LandingPage.tsx
-    │   ├── DashboardPage.tsx
-    │   ├── SummaryPage.tsx
-    │   ├── FlashcardsPage.tsx
-    │   ├── QuizPage.tsx
-    │   ├── WeakTopicsPage.tsx
-    │   ├── PlannerPage.tsx
-    │   ├── ChatPage.tsx
-    │   ├── ConceptMapPage.tsx
-    │   └── ProfilePage.tsx
-    ├── data/
-    │   ├── mockData.ts
-    │   └── sampleNotes.ts
-    └── types/
-        └── index.ts
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "options": {
+    "typeAware": true
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
 ```
 
----
-
-## 🎨 Tech Stack & Features
-
-- **Frontend Framework**: React 19 + TypeScript + Vite
-- **Styling**: Tailwind CSS + Custom Hybrid Glassmorphism Utilities
-- **Animations**: Framer Motion + 3D CSS perspective card flips
-- **Icons**: Lucide React
-- **Data Visualizations**: Recharts Radar & Performance Heatmaps
-- **Celebration Effects**: Canvas Confetti
+See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.

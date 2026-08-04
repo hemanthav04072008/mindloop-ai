@@ -8,7 +8,9 @@ import {
   ExternalLink, 
   Bot, 
   User as UserIcon,
-  ChevronRight
+  ChevronRight,
+  Trash2,
+  Download
 } from 'lucide-react';
 import { ChatMessage } from '../types';
 import { MOCK_CHAT_MESSAGES } from '../data/mockData';
@@ -16,24 +18,33 @@ import { MOCK_CHAT_MESSAGES } from '../data/mockData';
 export const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>(MOCK_CHAT_MESSAGES);
   const [inputText, setInputText] = useState('');
-  const [activeCitation, setActiveCitation] = useState<any | null>(null);
+  const [activeCitation, setActiveCitation] = useState<any | null>(MOCK_CHAT_MESSAGES[1].citations?.[0] || null);
+  const [isTyping, setIsTyping] = useState(false);
 
-  const handleSend = () => {
-    if (!inputText.trim()) return;
+  const suggestedPrompts = [
+    "What is the net ATP yield per glucose molecule?",
+    "Explain Complex II in the electron transport chain.",
+    "Summarize PFK-1 regulation in Glycolysis."
+  ];
+
+  const handleSend = (textToSend?: string) => {
+    const query = textToSend || inputText;
+    if (!query.trim()) return;
 
     const userMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
       sender: 'user',
-      text: inputText,
+      text: query,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
     setMessages((prev) => [...prev, userMsg]);
-    const query = inputText;
-    setInputText('');
+    if (!textToSend) setInputText('');
+    setIsTyping(true);
 
     // Simulate AI response with note citation after delay
     setTimeout(() => {
+      setIsTyping(false);
       const aiReply: ChatMessage = {
         id: `msg-ai-${Date.now()}`,
         sender: 'ai',
@@ -56,7 +67,13 @@ The mitochondrial inner membrane maintains a tight proton barrier. When electron
         ]
       };
       setMessages((prev) => [...prev, aiReply]);
-    }, 1000);
+      setActiveCitation(aiReply.citations?.[0]);
+    }, 1200);
+  };
+
+  const handleClearChat = () => {
+    setMessages([]);
+    setActiveCitation(null);
   };
 
   return (
@@ -85,7 +102,40 @@ The mitochondrial inner membrane maintains a tight proton barrier. When electron
               </p>
             </div>
           </div>
+
+          <button
+            onClick={handleClearChat}
+            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+            title="Clear Chat History"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
+
+        {/* Suggested Quick Prompts Bar */}
+        {messages.length === 0 && (
+          <div className="p-6 text-center space-y-4 my-auto">
+            <Bot className="w-12 h-12 text-[#4ECDC4] mx-auto animate-bounce" />
+            <h3 className="text-base font-bold text-white font-[#Outfit]">
+              Ask Anything About Your Notes
+            </h3>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              MindLoop grounds every response with exact PDF citations. Try one of these prompts:
+            </p>
+            <div className="flex flex-col gap-2 max-w-md mx-auto">
+              {suggestedPrompts.map((prompt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSend(prompt)}
+                  className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-medium text-[#4ECDC4] text-left transition-all cursor-pointer flex items-center justify-between"
+                >
+                  <span>⚡ {prompt}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Messages Scroll Area */}
         <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-6">
@@ -142,9 +192,7 @@ The mitochondrial inner membrane maintains a tight proton barrier. When electron
                     {msg.suggestedFollowUps.map((prompt, idx) => (
                       <button
                         key={idx}
-                        onClick={() => {
-                          setInputText(prompt);
-                        }}
+                        onClick={() => handleSend(prompt)}
                         className="px-3 py-1 rounded-full bg-[#6C63FF]/10 hover:bg-[#6C63FF]/20 border border-[#6C63FF]/30 text-[11px] font-semibold text-[#6C63FF] transition-all cursor-pointer"
                       >
                         ⚡ {prompt}
@@ -155,6 +203,19 @@ The mitochondrial inner membrane maintains a tight proton barrier. When electron
               </div>
             </div>
           ))}
+
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="flex gap-3 max-w-2xl">
+              <div className="w-8 h-8 rounded-full bg-[#4ECDC4]/20 border border-[#4ECDC4]/40 flex items-center justify-center text-[#4ECDC4]">
+                <Bot className="w-4 h-4" />
+              </div>
+              <div className="glass-panel p-4 rounded-2xl border border-white/15 text-xs text-slate-400 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#4ECDC4] animate-spin" />
+                <span>MindLoop AI is searching note vectors...</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Input Bar */}
@@ -169,7 +230,7 @@ The mitochondrial inner membrane maintains a tight proton barrier. When electron
               className="w-full pl-4 pr-12 py-3 bg-white/[0.04] text-white text-xs sm:text-sm placeholder-slate-400 rounded-xl border border-white/15 focus:border-[#6C63FF] focus:outline-none"
             />
             <button
-              onClick={handleSend}
+              onClick={() => handleSend()}
               className="absolute right-2 p-2 rounded-lg bg-[#6C63FF] text-white hover:bg-[#5A52E0] transition-colors cursor-pointer"
             >
               <Send className="w-4 h-4" />

@@ -1,4 +1,4 @@
-import { 
+import type { 
   Subject, 
   Flashcard, 
   QuizQuestion, 
@@ -7,7 +7,8 @@ import {
   MemoryLoopItem, 
   ConceptNode, 
   ChatMessage, 
-  UserProfile 
+  UserProfile,
+  TeamMember
 } from '../types';
 
 export const INITIAL_USER_PROFILE: UserProfile = {
@@ -31,6 +32,49 @@ export const INITIAL_USER_PROFILE: UserProfile = {
     { id: 'b5', title: 'Concept Weaver', icon: '🌐', unlockedAt: '2026-07-15', description: 'Connected 20+ concepts in the Mind Map visualizer.' }
   ]
 };
+
+export const HACKATHON_TEAM_MEMBERS: TeamMember[] = [
+  {
+    id: 'tm-1',
+    name: 'Alex Morgan',
+    role: 'Team Lead / ML Engineer',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    xp: 3420,
+    streak: 7,
+    status: 'Online',
+    cardsMastered: 342
+  },
+  {
+    id: 'tm-2',
+    name: 'Priya Sharma',
+    role: 'AI Prompt Architect',
+    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+    xp: 3180,
+    streak: 9,
+    status: 'In Quiz',
+    cardsMastered: 310
+  },
+  {
+    id: 'tm-3',
+    name: 'Marcus Vance',
+    role: 'Full-Stack Developer',
+    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    xp: 2950,
+    streak: 5,
+    status: 'Focusing',
+    cardsMastered: 285
+  },
+  {
+    id: 'tm-4',
+    name: 'Elena Rostova',
+    role: 'UI/UX Lead Designer',
+    avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80',
+    xp: 2840,
+    streak: 8,
+    status: 'Online',
+    cardsMastered: 270
+  }
+];
 
 export const MOCK_SUBJECTS: Subject[] = [
   {

@@ -6,7 +6,8 @@ import {
   Focus, 
   Flame, 
   Sparkles, 
-  Share2
+  Share2,
+  Code2
 } from 'lucide-react';
 import type { UserProfile } from '../types';
 
@@ -30,7 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-[#09090B]/70 border-b border-white/10 px-4 md:px-8 py-3 transition-all">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-[#09090B]/75 border-b border-white/10 px-4 md:px-8 py-3 transition-all">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         
         {/* Left: Brand Identity */}
@@ -39,7 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('dashboard')} 
             className="flex items-center gap-3 cursor-pointer group"
           >
-            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6C63FF] via-[#4ECDC4] to-[#FFB84D] p-[1.5px] shadow-[0_0_20px_rgba(108,99,255,0.4)] group-hover:scale-105 transition-transform duration-300">
+            <div className="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6C63FF] via-[#4ECDC4] to-[#FFB84D] p-[1.5px] shadow-[0_0_25px_rgba(108,99,255,0.45)] group-hover:scale-105 transition-transform duration-300">
               <div className="w-full h-full bg-[#13131A] rounded-[10.5px] flex items-center justify-center">
                 <Zap className="w-5 h-5 text-[#4ECDC4] group-hover:rotate-12 transition-transform duration-300" />
               </div>
@@ -49,6 +50,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 MindLoop <span className="text-[10px] font-semibold tracking-wider px-1.5 py-0.5 rounded-md bg-[#6C63FF]/20 text-[#6C63FF] border border-[#6C63FF]/30 uppercase">AI v2.6</span>
               </span>
             </div>
+          </div>
+
+          {/* Hackathon Team Role Badge */}
+          <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] font-medium text-slate-300">
+            <Code2 className="w-3.5 h-3.5 text-[#4ECDC4]" />
+            <span>Member 1 • Frontend Lead</span>
           </div>
         </div>
 
